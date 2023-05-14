@@ -11,11 +11,18 @@ const router = new Router();
 const server = http.createServer(app.callback());
 
 router.get('/:uid([0-9]{25})', async (ctx) => {
-  const midResponse = await axios.get(`https://info.midpass.ru/api/request/${ctx.params.uid}`);
-  const midData = await midResponse.data;
-  if (midResponse.headers.hasOwnProperty('content-type')) {
-    ctx.response.body = await midData
-  } 
+
+  await axios.get(
+    `https://info.midpass.ru/api/request/${ctx.params.uid}`,
+    {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'
+      }
+    })
+    .then(data => ctx.response.body = data.data)
+    .catch(error => {
+      console.log(error);
+    })
 });
 
 app.use(koaBody({
